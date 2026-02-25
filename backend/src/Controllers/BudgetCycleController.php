@@ -1,0 +1,79 @@
+<?php 
+
+namespace App\Controllers; 
+
+use App\Services\BudgetCycleService; 
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request; 
+
+class BudgetCycleController
+{
+    public function store(Request $request, Response $response): Response
+    {
+
+        $data = json_decode($request->getBody()->getContents(), true); 
+
+        if(!$data){
+            return $this->json($response, [
+                'error' => 'Invalid JSON'
+            ], 400); 
+        }
+
+        try {
+            $cycle = BudgetCycleService::create($data); 
+            return $this->json($response, $cycle, 201); 
+        } catch (\InvalidArgumentException $e) {
+            return $this->json($response, [
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function index(Request $request, Response $response): Response
+    {
+        $cycles = BudgetCycleService::getAll(); 
+
+        return $this->json($response, $cycles); 
+    }
+
+    public function update(Request $request, Response $response, array $args): Response
+    {
+        $id = (int) $args['id']; 
+        $data = json_decode($request->getBody()->getContents(), true); 
+
+        if (!$data) {
+            return $this->json($response, ['error' => 'Invalid JSON'], 400); 
+        }
+
+        try {
+            $cycle = BudgetCycleService::update($id, $data); 
+            return $this->json($response, $cycle, 200); 
+
+        } catch (\InvalidArgumentException $e) {
+            return $this->json($response, ['error' => $e->getMessage()], 400); 
+        }
+    }
+
+    public function delete(Request $request, Response $response, array $args): Response
+    {
+        $id = (int) $args['id']; 
+
+        try {
+            BudgetCycleService::delete($id); 
+
+            return $response->withStatus(204); 
+        } catch (\InvalidArgumentException $e) {
+            return $this->json($response, [
+                'error' => $e->getMessage()
+            ], 400); 
+        }
+    }
+
+    private function json(Response $response, array $data, int $status = 200): Response
+    {
+        $response->getBody()->write(json_encode($data)); 
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus($status); 
+    }
+}
