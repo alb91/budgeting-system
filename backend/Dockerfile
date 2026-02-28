@@ -26,6 +26,9 @@ RUN echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/xdebug.ini \
 # Instalar Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# COPY ONLY composer files first
+COPY composer.json composer.lock ./
+
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 COPY . .
