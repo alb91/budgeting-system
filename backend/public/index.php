@@ -20,14 +20,14 @@ $app->add(function (Request $request, RequestHandler $handler): Response {
 
     return $response
     // por ahora voy a hardcodear pero tengo que ver cómo crear una variable para el localhost
-        ->withHeader('Access-Control-Allow-Origin', 'http://localhost:5173')
+        ->withHeader('Access-Control-Allow-Origin', $_ENV['FRONTEND_URL'])
         ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); 
 });
 
 $app->options('/{routes:.+}', function (Request $request, Response $response) {
     return $response
-        ->withHeader('Access-Control-Allow-Origin', 'http://localhost:5173')
+        ->withHeader('Access-Control-Allow-Origin', $_ENV['FRONTEND_URL'])
         ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
         ->withStatus(200);
