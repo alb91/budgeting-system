@@ -93,6 +93,7 @@
 <script setup>
 //imports
 import { ref, onMounted, computed, reactive } from 'vue'
+import { useFormatters } from '@/composables/useFormatters'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api/http'
 import Swal from 'sweetalert2'
@@ -103,6 +104,7 @@ import en from '@/locales/en/expenses'
 
 //constants
 const translations = { es, en }
+const { formatCurrency, capitalize } = useFormatters()
 
 const route = useRoute()
 const router = useRouter()
@@ -246,7 +248,7 @@ function t(key) {
 }
 
 function onAmountInput(e) {
-  const numeric = e.target.value.replace(/[^\d]/g, '');
+  const numeric = e.target.value.replace(/[^\d.]/g, '');
   amount.value = numeric ? Number(numeric) : 0;
 }
 
@@ -266,21 +268,6 @@ function closeModal() {
   errors.name = null; 
   errors.date = null; 
   errors.amount = null; 
-}
-
-function capitalize(str) {
-  if (!str) return ''; 
-  return str.charAt(0).toUpperCase() + str.slice(1); 
-}
-
-function formatCurrency(amount) {
-  if (amount === null || amount === undefined) return '$0.00';
-
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    minimumFractionDigits: 2
-  }).format(amount);
 }
 
 function editExpense(expense) {

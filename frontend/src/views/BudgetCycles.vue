@@ -55,6 +55,8 @@
             <th>{{ t('start') }}</th>
             <th>{{ t('end') }}</th>
             <th>{{ t('budget') }}</th>
+            <th>{{ t('spent') }}</th>
+            <th>{{ t('remaining') }}</th>
             <th>{{ t('actions') }}</th>
           </tr>
         </thead>
@@ -65,6 +67,8 @@
             <td>{{ cycle.start_date }}</td>
             <td>{{ cycle.end_date }}</td>
             <td>{{ formatCurrency(cycle.budget) }}</td>
+            <td>{{ formatCurrency(cycle.spent) }}</td>
+            <td>{{ formatCurrency(cycle.remaining) }}</td>
             <td>
               <div class="dropdown">
                 <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -97,6 +101,7 @@
 <script setup>
 //imports
 import { ref, onMounted, computed, reactive } from 'vue'
+import { useFormatters } from '@/composables/useFormatters'
 import { useRouter } from 'vue-router'
 import api from '@/api/http'
 import Swal from 'sweetalert2'
@@ -107,6 +112,7 @@ import en from '@/locales/en/budgetCycles'
 
 //constants
 const translations = { es, en }
+const { formatCurrency, capitalize } = useFormatters()
 const router = useRouter()
 
 //refs
@@ -118,6 +124,8 @@ const name = ref('')
 const startDate = ref('')
 const endDate = ref('')
 const budget = ref(0)
+const spent = ref(0)
+const remaining = ref(0)
 const isEditing = ref(false)
 const editingId = ref(null)
 
@@ -237,7 +245,7 @@ async function save() {
     startDate.value = ''
     endDate.value = ''
     budget.value = 0
-
+  
     closeModal()
 
   } catch (error){
@@ -278,24 +286,9 @@ function closeModal() {
   errors.budget = null; 
 }
 
-function formatCurrency(amount) {
-  if (amount === null || amount === undefined) return '$0.00';
-
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    minimumFractionDigits: 2
-  }).format(amount);
-}
-
 function onBudgetInput(e) {
-  const numeric = e.target.value.replace(/[^\d]/g, '');
+  const numeric = e.target.value.replace(/[^\d.]/g, '');
   budget.value = numeric ? Number(numeric) : 0;
-}
-
-function capitalize(str) {
-  if (!str) return ''; 
-  return str.charAt(0).toUpperCase() + str.slice(1); 
 }
 
 function editCycle(cycle) {

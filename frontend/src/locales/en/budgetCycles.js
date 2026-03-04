@@ -29,4 +29,6 @@ export default {
   cancel: 'Cancel',
   save: 'Save',
   addExpenses: "Add expenses",
+  spent: "Spent",
+  remaining: "Remaining"
 }

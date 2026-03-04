@@ -14,10 +14,16 @@ class BudgetCycleRepository
         $pdo = Database::connect(); 
 
         $stmt = $pdo->query("
-            SELECT id, name, start_date, end_date, budget
-            FROM " . self::TABLE . "
-            WHERE status != 2
-            ORDER BY id DESC
+            SELECT bc.id, bc.name, bc.start_date, bc.end_date, bc.budget, 
+                COALESCE(SUM(e.amount), 0) AS spent, 
+                bc.budget - COALESCE(SUM(e.amount), 0) AS remaining
+            FROM " . self::TABLE .  " bc
+            LEFT JOIN expenses e
+                ON bc.id = e.cycle_id
+                AND e.status != 2
+            WHERE bc.status != 2
+            GROUP BY bc.id
+            ORDER BY bc.id DESC
         ");
 
         return $stmt->fetchALL(\PDO::FETCH_ASSOC); 
