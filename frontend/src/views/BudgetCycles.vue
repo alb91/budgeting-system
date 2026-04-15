@@ -70,21 +70,16 @@
             <td>{{ formatCurrency(cycle.spent) }}</td>
             <td>{{ formatCurrency(cycle.remaining) }}</td>
             <td>
-              <div class="dropdown">
-                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  {{ t('actions')  }}
+              <div class="d-flex gap-1 justify-content-center">
+                <button class="btn btn-sm btn-outline-primary" @click="addExpenses(cycle.id)" :title="t('addExpenses')">
+                  <i class="bi bi-plus-circle"></i>
                 </button>
-                <ul class="dropdown-menu">
-                  <li>
-                    <button class="dropdown-item" @click="addExpenses(cycle.id)">{{ t('addExpenses') }}</button>
-                  </li>
-                  <li>
-                    <button class="dropdown-item" @click="editCycle(cycle)">{{ t('edit') }}</button>
-                  </li>
-                  <li>
-                    <button class="dropdown-item text-danger" @click="deleteCycle(cycle.id)">{{ t('delete') }}</button>
-                  </li>
-                </ul>
+                <button class="btn btn-sm btn-outline-warning" @click="editCycle(cycle)" :title="t('edit')">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" @click="deleteCycle(cycle.id)" :title="t('delete')">
+                  <i class="bi bi-trash"></i>
+                </button>
               </div>
             </td>
           </tr>

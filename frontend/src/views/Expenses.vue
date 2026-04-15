@@ -67,17 +67,12 @@
             <td>{{ formatCurrency(expense.amount) }}</td>
             <td>
               <div class="dropdown">
-                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  {{ t('actions')  }}
+                <button class="btn btn-sm btn-outline-warning" @click="editExpense(expense)" :title="t('edit')">
+                  <i class="bi bi-pencil"></i>
                 </button>
-                <ul class="dropdown-menu">
-                  <li>
-                    <button class="dropdown-item" @click="editExpense(expense)">{{ t('edit') }}</button>
-                  </li>
-                  <li>
-                    <button class="dropdown-item text-danger" @click="deleteExpense(expense.id)">{{ t('delete') }}</button>
-                  </li>
-                </ul>
+                <button class="btn btn-sm btn-outline-danger" @click="deleteExpense(expense.id)" :title="t('delete')">
+                  <i class="bi bi-trash"></i>
+                </button>
               </div>
             </td>
           </tr>

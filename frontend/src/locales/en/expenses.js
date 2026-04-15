@@ -1,7 +1,7 @@
 export default {
     goBack: 'Go back',
     createExpense: 'Create Expense',
-        
+    editExpense: 'Edit Expense',
     nameRequired: 'Name Required', 
     dateRequired: 'Date Required', 
     amountInvalid: 'Invalid Amount',
