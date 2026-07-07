@@ -24,13 +24,14 @@ class ExpenseService
 
     public static function create(array $data): array
     {
-        self::validate($data); 
-
+        self::validate($data);
+        
         return ExpenseRepository::create([
             'cycle_id' => $data['cycle_id'],
             'name'     => strtolower($data['name']),
             'date'     => $data['date'],
-            'amount'   => $data['amount']
+            'amount'   => $data['amount'],
+            'notify'   => $data['notify'],
         ]);
     }
 
@@ -45,7 +46,7 @@ class ExpenseService
         return ExpenseRepository::update($id, [
             'name' => strtolower($data['name']),
             'date' => $data['date'],
-            'amount' => $data['amount']
+            'amount' => $data['amount'],
         ]);
     }
 

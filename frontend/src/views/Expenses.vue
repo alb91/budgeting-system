@@ -20,24 +20,43 @@
     </div>
 
     <div class="modal fade" tabindex="-1" v-if="showForm" :class="{ show: showForm }" style="display:block;">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">{{ isEditing ? t('editExpense') : t('newExpense') }}</h5>
             <button type="button" class="btn-close" @click="closeModal"></button>
           </div>
           <div class="modal-body">
-            <div class="mb-3">
-              <input type="text" class="form-control" :placeholder="t('expensePlaceHolder')" :class="{ 'is-invalid': errors.name }" v-model="name">
-              <div class="invalid-feedback"> {{ errors.name }} </div>
-            </div>
-            <div class="mb-3">
-              <input type="date" class="form-control" :class="{ 'is-invalid': errors.date }" v-model="date">
-              <div class="invalid-feedback"> {{ errors.date }} </div>
-            </div>
-            <div class="mb-3">
-              <input type="text" class="form-control" :class="{ 'is-invalid': errors.amount }" :value="amountDisplay" @input="onAmountInput" :placeholder="t('amountPlaceHolder')">
-              <div class="invalid-feedback">{{ errors.amount }} </div>
+            <div v-for="(entry, index) in entries" :key="index" class="row mb-3 align-items-center">
+
+              <div class="col">
+                <input type="text" class="form-control" :class="{ 'is-invalid': errors[index]?.name }" :placeholder="t('expensePlaceHolder')" v-model="entry.name">
+                <div v-if="errors[index]?.name" class="invalid-feedback d-block">{{ errors[index].name }}</div>
+              </div>
+
+              <div class="col">
+                <input type="date" class="form-control" :class="{ 'is-invalid': errors[index]?.date }" v-model="entry.date">
+                <div v-if="errors[index]?.date" class="invalid-feedback d-block">{{ errors[index].date }}</div>
+              </div>
+
+              <div class="col">
+                <input type="number" step="0.01" class="form-control" :class="{ 'is-invalid': errors[index]?.amount }" v-model.number="entry.amount">
+                <div v-if="errors[index]?.amount" class="invalid-feedback d-block">{{ errors[index].amount }}</div>
+              </div>
+
+              <div class="col-auto">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" v-model="entry.notify" :id="`notify-${index}`">
+                  <label class="form-check-label" :for="`notify-${index}`">Notify</label>
+                </div>
+              </div>
+
+              <div class="col-auto d-flex gap-1">
+                <button v-if="entries.length > 1" class="btn btn-danger btn-sm" @click="removeRow(index)">-</button>
+                
+                <button class="btn btn-success btn-sm" @click="addRow">+</button>
+              </div>
+
             </div>
           </div>
           <div class="modal-footer">
@@ -101,21 +120,12 @@ import en from '@/locales/en/expenses'
 const translations = { es, en }
 const { formatCurrency, capitalize } = useFormatters()
 
-const route = useRoute()
-const router = useRouter()
-const cycleId = route.params.id
-const cycle = ref(null)
-const expenses = ref([])
-
-const errors = reactive({
-  name: null,
-  date: null,
-  amount: null
-});
-
-const amountDisplay = computed(() => {
-  return amount.value ? new Intl.NumberFormat('es-MX').format(amount.value) : ''
-}); 
+const route = useRoute();
+const router = useRouter();
+const cycleId = route.params.id;
+const cycle = ref(null);
+const expenses = ref([]);
+const errors = ref([]); 
 
 const totalSpent = computed(() => 
   expenses.value.reduce((sum, e) => sum + Number(e.amount), 0)
@@ -127,9 +137,9 @@ cycle.value ? cycle.value.budget - totalSpent.value : 0
 //refs
 const lang = ref('es')
 const showForm = ref(false)
-const name = ref('')
-const date = ref('')
-const amount = ref(0)
+const entries = ref([
+  { name: '', date: '',  amount: 0}
+])
 const isEditing = ref(false) 
 const editingId = ref(null)
 
@@ -149,50 +159,66 @@ async function loadExpenses() {
 
 async function save() {
 
-  errors.name = null; 
-  errors.date = null; 
-  errors.amount = null; 
+  errors.value = entries.value.map(() => ({
+    name: null,
+    date: null,
+    amount: null
+  }));
 
   let hasError = false; 
 
-  if (!name.value.trim()) {
-    errors.name = t('nameRequired'); 
-    hasError = true; 
-  }
+  for (const [index, entry] of entries.value.entries()) {
+    if (!entry.name.trim()) {
+      errors.value[index].name = t('nameRequired');
+      hasError = true;
+    }
 
-  if (!date.value) {
-    errors.date = t('dateRequired'); 
-    hasError = true; 
-  }
+    if (!entry.date) {
+      errors.value[index].date = t('dateRequired');
+      hasError = true; 
+    }
 
-  if (!amount.value || amount.value <= 0) {
-    errors.amount = t('amountInvalid'); 
-    hasError = true; 
+    if (!entry.amount || entry.amount <= 0) {
+      errors.value[index].amount = t('amountInvalid'); 
+      hasError = true; 
+    }
   }
 
   if (hasError) return; 
-
+  
   try {
     if (isEditing.value) {
+
+      const entry = entries.value[0]; 
+
       await api.put(`/expenses/${ editingId.value }`, {
-        name: name.value,
-        date: date.value,
-        amount: amount.value
+        name: entry.name,
+        date: entry.date,
+        amount: entry.amount, 
+        notify: entry.notify
       });
     } else {
-      await api.post('/expenses', {
-        cycle_id: cycleId,
-        name: name.value, 
-        date: date.value,
-        amount: amount.value
-      });
+      for (const entry of entries.value) {
+        await api.post('/expenses', {
+          cycle_id: cycleId,
+          name: entry.name, 
+          date: entry.date,
+          amount: entry.amount,
+          notify: entry.notify ?? 0,
+        });
+      }
     }
 
     await loadExpenses(); 
 
-    name.value = ''
-    date.value = ''
-    amount.value = ''
+    entries.value = [
+      {
+        name: '',
+        date: '',
+        amount: 0,
+        notify: 0
+      }
+    ];
 
     closeModal(); 
   } catch (error) {
@@ -242,13 +268,29 @@ function t(key) {
  return translations[lang.value][key];  
 }
 
-function onAmountInput(e) {
+function addRow() {
+  entries.value.push({ name: '', date: '', amount: 0, notify: 0 });
+  errors.value.push({ name: null, date: null, amount: null });
+}
+
+function removeRow(index) {
+  entries.value.splice(index, 1)
+}
+
+function onAmountInput(e, index) {
   const numeric = e.target.value.replace(/[^\d.]/g, '');
-  amount.value = numeric ? Number(numeric) : 0;
+
+  entries.value[index].amount =  numeric ? Number(numeric) : 0;
 }
 
 function openModal() {
   showForm.value = true; 
+
+  errors.value = entries.value.map(() => ({
+    name: null,
+    date: null, 
+    amount: null
+  }));
 }
 
 function closeModal() {
@@ -256,22 +298,26 @@ function closeModal() {
   isEditing.value = false; 
   editingId.value = null; 
 
-  name.value = '';
-  date.value = ''; 
-  amount.value = ''; 
+  entries.value = [{
+    name: '', 
+    date: '',
+    amount: 0,
+    notify: 0
+  }]; 
 
-  errors.name = null; 
-  errors.date = null; 
-  errors.amount = null; 
+  errors.value = [];
 }
 
 function editExpense(expense) {
   isEditing.value = true; 
   editingId.value = expense.id; 
 
-  name.value = expense.name,
-  date.value = expense.date,
-  amount.value = expense.amount
+  entries.value = [{
+    name: expense.name,
+    date: expense.date,
+    amount: Number(expense.amount),
+    notify: expense.notify
+  }];
 
   showForm.value = true; 
 }
@@ -281,7 +327,3 @@ function goBack() {
 }
 
 </script>
-
-<!-- Hay que segmentar los helpers y demás cosas repetidas, posiblemente lo de las traducciones
- comenzar con el crud para expenses 
- -->

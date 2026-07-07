@@ -36,8 +36,8 @@ class ExpenseRepository
             $pdo->beginTransaction();
 
             $stmt = $pdo->prepare("
-                INSERT INTO " . self::TABLE . " (cycle_id, name, date, amount)
-                VALUES (:cycle_id, :name, :date, :amount)
+                INSERT INTO " . self::TABLE . " (cycle_id, name, date, amount, notify)
+                VALUES (:cycle_id, :name, :date, :amount, :notify)
             ");
 
             $stmt->execute($data); 
@@ -117,5 +117,46 @@ class ExpenseRepository
             $pdo->rollBack(); 
             throw $e; 
         }
+    }
+
+    public static function getPendingNotifications(): array
+    {
+        $pdo = Database::connect(); 
+        
+        $stmt = $pdo->prepare("
+            SELECT 
+                id, 
+                cycle_id,
+                name,
+                date,
+                amount
+            FROM " . self::TABLE . "
+            WHERE
+                status = 1
+                AND notify = 1
+                AND notification_sent IS NULL
+                AND DATE(date) = CURDATE()
+        ");
+
+        $stmt->execute(); 
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); 
+    }
+
+    public static function markNotificationSent(int $expenseId): void
+    {
+        $pdo = Database::connect(); 
+
+        $stmt = $pdo->prepare("
+            UPDATE " . self::TABLE ."
+            SET 
+                notification_sent = 1,
+                notification_sent_at = NOW()
+            WHERE id = :id
+        ");
+
+        $stmt->execute([
+            ':id' => $expenseId
+        ]);
     }
 }

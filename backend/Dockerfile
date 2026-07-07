@@ -23,6 +23,13 @@ RUN echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.log_level=0" >> /usr/local/etc/php/conf.d/xdebug.ini
 
+ENV TZ=America/Chihuahua
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone
+
+RUN echo "date.timezone=America/Chihuahua" > /usr/local/etc/php/conf.d/timezone.ini
+
 # Instalar Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
