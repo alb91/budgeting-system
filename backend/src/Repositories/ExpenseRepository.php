@@ -14,7 +14,7 @@ class ExpenseRepository
         $pdo = Database::connect(); 
 
         $stmt = $pdo->prepare("
-        SELECT id, name, date, amount
+        SELECT id, name, date, amount, notify
         FROM " . self::TABLE . "
         WHERE cycle_id = :cycle_id
         AND status = 1
@@ -61,12 +61,23 @@ class ExpenseRepository
         try {
             $pdo->beginTransaction();
 
+            $check = $pdo->prepare("
+                SELECT 1
+                FROM " . self::TABLE . "
+                WHERE id = :id    
+            ");
+
+            if(!$check->fetchColumn()){
+                throw new \RuntimeException('Expense not found'); 
+            }
+
             $stmt = $pdo->prepare("
                 UPDATE " . self::TABLE ."
                 SET
                     name = :name,
                     date = :date,
-                    amount = :amount
+                    amount = :amount,
+                    notify = :notify
                 WHERE id = :id
             ");
 
@@ -74,12 +85,9 @@ class ExpenseRepository
                 ':name'   => $data['name'],
                 ':date'   => $data['date'],
                 ':amount' => $data['amount'],
+                ':notify' => $data['notify'],
                 ':id'     => $id
             ]);
-
-            if ($stmt->rowCount() === 0) {
-                throw new \RuntimeException('Expense not found o no changes applied'); 
-            }
 
             $pdo->commit(); 
 

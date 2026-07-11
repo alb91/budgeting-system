@@ -11,7 +11,7 @@ class ExpenseService
         $cycle = BudgetCycleRepository::getById($cycleId);
         
         if (!$cycle) {
-            throw new \RuntimeException('Cycle nof found'); 
+            throw new \RuntimeException('Cycle not found'); 
         }
 
         $expenses = ExpenseRepository::getAllByCycle($cycleId);
@@ -31,7 +31,7 @@ class ExpenseService
             'name'     => strtolower($data['name']),
             'date'     => $data['date'],
             'amount'   => $data['amount'],
-            'notify'   => $data['notify'],
+            'notify'   => $data['notify'] ? 1 : 0,
         ]);
     }
 
@@ -41,12 +41,13 @@ class ExpenseService
             throw new \InvalidArgumentException('ID is required'); 
         }
 
-        self::validate($data); 
+        self::validate($data);
 
         return ExpenseRepository::update($id, [
-            'name' => strtolower($data['name']),
-            'date' => $data['date'],
+            'name'   => strtolower($data['name']),
+            'date'   => $data['date'],
             'amount' => $data['amount'],
+            'notify' => $data['notify'] ? 1 : 0,
         ]);
     }
 

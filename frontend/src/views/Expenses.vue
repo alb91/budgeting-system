@@ -316,7 +316,7 @@ function editExpense(expense) {
     name: expense.name,
     date: expense.date,
     amount: Number(expense.amount),
-    notify: expense.notify
+    notify: Boolean(expense.notify)
   }];
 
   showForm.value = true; 
