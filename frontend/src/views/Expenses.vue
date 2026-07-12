@@ -195,7 +195,7 @@ async function save() {
         name: entry.name,
         date: entry.date,
         amount: entry.amount, 
-        notify: entry.notify
+        notify: entry.notify ? 1 : 0
       });
     } else {
       for (const entry of entries.value) {
@@ -204,7 +204,7 @@ async function save() {
           name: entry.name, 
           date: entry.date,
           amount: entry.amount,
-          notify: entry.notify ?? 0,
+          notify: entry.notify ? 1 : 0,
         });
       }
     }

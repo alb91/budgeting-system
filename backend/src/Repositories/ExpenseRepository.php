@@ -67,6 +67,8 @@ class ExpenseRepository
                 WHERE id = :id    
             ");
 
+            $check->execute([":id" => $id]); 
+
             if(!$check->fetchColumn()){
                 throw new \RuntimeException('Expense not found'); 
             }
