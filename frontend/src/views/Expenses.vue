@@ -51,7 +51,7 @@
                 </div>
               </div>
 
-              <div class="col-auto d-flex gap-1">
+              <div v-if="!isEditing" class="col-auto d-flex gap-1">
                 <button v-if="entries.length > 1" class="btn btn-danger btn-sm" @click="removeRow(index)">-</button>
                 
                 <button class="btn btn-success btn-sm" @click="addRow">+</button>
@@ -68,19 +68,39 @@
     </div>
     <div class="modal-backdrop fade show" v-show="showForm"></div>
 
+  <nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+      <form class="d-flex">
+        <input class="form-control me-2" type="search" @input="search" :placeholder="t('search')" aria-label="Search">
+      </form>
+    </div>
+  </nav>
+
     <div v-if="expenses.length" class="expenses">
       <table class="table table-hover mt-3">
         <thead class="table-light">
           <tr>
-            <th>{{ t('name') }}</th>
-            <th>{{ t('date') }}</th>
-            <th>{{ t('amount') }}</th>
+            <th>
+              {{ t('name') }}
+              <button type="button" class="btn btn-outline-success btn-sm" v-if="sortDirection === 'asc' && sortBy === 'name'" @click="sortData('name', 'desc')"><i class="bi bi-arrow-down"></i></button>
+              <button type="button" class="btn btn-outline-success btn-sm" v-else @click="sortData('name', 'asc')"><i class="bi bi-arrow-up"></i></button>
+            </th>
+            <th>
+              {{ t('date') }}
+              <button type="button" class="btn btn-outline-success btn-sm" v-if="sortDirection === 'asc' && sortBy === 'date'" @click="sortData('date', 'desc')"><i class="bi bi-arrow-down"></i></button>
+              <button type="button" class="btn btn-outline-success btn-sm" v-else @click="sortData('date', 'asc')"><i class="bi bi-arrow-up"></i></button>
+            </th>
+            <th>
+              {{ t('amount') }}
+              <button type="button" class="btn btn-outline-success btn-sm" v-if="sortDirection === 'asc' && sortBy === 'amount'" @click="sortData('amount', 'desc')"><i class="bi bi-arrow-down"></i></button>
+              <button type="button" class="btn btn-outline-success btn-sm" v-else @click="sortData('amount', 'asc')"><i class="bi bi-arrow-up"></i></button>
+            </th>
             <th>{{ t('actions') }}</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="expense in expenses" :key="expense.id">
+          <tr v-for="expense in filteredItems" :key="expense.id">
             <td>{{ capitalize(expense.name) }}</td>
             <td>{{ expense.date }}</td>
             <td>{{ formatCurrency(expense.amount) }}</td>
@@ -126,6 +146,8 @@ const cycleId = route.params.id;
 const cycle = ref(null);
 const expenses = ref([]);
 const errors = ref([]); 
+const searchFilter = ref('');
+
 
 const totalSpent = computed(() => 
   expenses.value.reduce((sum, e) => sum + Number(e.amount), 0)
@@ -142,6 +164,49 @@ const entries = ref([
 ])
 const isEditing = ref(false) 
 const editingId = ref(null)
+const sortDirection = ref(null); 
+const sortBy = ref(null);
+
+const filteredItems = computed(() => {
+  if(searchFilter.value != ''){
+    return expenses.value.filter(expense => expense.name.includes(searchFilter.value))
+  }
+  return expenses.value;
+})
+
+const search = (e) => {
+  searchFilter.value = e.target.value;  
+}
+
+const sortData = (column, direction) => { 
+  sortDirection.value = direction;
+  sortBy.value = column;
+  if(direction === 'asc' && column === 'name'){ 
+    expenses.value.sort((a, b) => {
+      return a.name.localeCompare(b.name);
+    });
+  }else if(direction === 'desc' && column === 'name'){
+    expenses.value.sort((a, b) => {
+      return b.name.localeCompare(a.name);
+    });
+  }else if(direction === 'asc' && column === 'date'){
+    expenses.value.sort((a, b) => {
+      return new Date(a.date) - new Date(b.date) 
+    });
+  }else if(direction === 'desc' && column === 'date'){ 
+    expenses.value.sort((a, b) => {
+      return new Date(b.date) - new Date(a.date) 
+    });
+  }else if(direction === 'asc' && column === 'amount'){
+    expenses.value.sort((a, b) => {
+      return parseFloat(a.amount) - parseFloat(b.amount) 
+    }); 
+  }else if(direction === 'desc' && column === 'amount'){
+    expenses.value.sort((a, b) => {
+      return parseFloat(b.amount) - parseFloat(a.amount) 
+    }); 
+  }
+}
 
 //lifecycle hooks
 onMounted(loadExpenses)
@@ -275,12 +340,6 @@ function addRow() {
 
 function removeRow(index) {
   entries.value.splice(index, 1)
-}
-
-function onAmountInput(e, index) {
-  const numeric = e.target.value.replace(/[^\d.]/g, '');
-
-  entries.value[index].amount =  numeric ? Number(numeric) : 0;
 }
 
 function openModal() {

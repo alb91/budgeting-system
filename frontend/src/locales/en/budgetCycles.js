@@ -30,5 +30,6 @@ export default {
   save: 'Save',
   addExpenses: "Add expenses",
   spent: "Spent",
-  remaining: "Remaining"
+  remaining: "Remaining",
+  searchCycles: 'Search cycles'
 }

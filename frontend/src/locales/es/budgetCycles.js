@@ -30,5 +30,6 @@ export default {
   save: 'Guardar',
   addExpenses: "Agregar gastos",
   spent: "Gastado",
-  remaining: "Restante"
+  remaining: "Restante",
+  searchCycles: 'Buscar ciclos'
 }

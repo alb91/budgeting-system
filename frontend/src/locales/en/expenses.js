@@ -27,5 +27,6 @@ export default {
     deleted: 'Deleted!',
     deleteSuccess: 'The expense has been deleted.',
     error: 'Error',
-    deleteError: 'Something went wrong'
+    deleteError: 'Something went wrong',
+    search: 'Search'
 }

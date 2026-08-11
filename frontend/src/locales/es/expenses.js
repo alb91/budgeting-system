@@ -27,5 +27,6 @@ export default {
     deleted: '¡Eliminado!',
     deleteSuccess: 'El gasto ha sido eliminado.',
     error: 'Error',
-    deleteError: 'Algo salió mal.'
+    deleteError: 'Algo salió mal.',
+    search: 'Búsqueda'
 }
