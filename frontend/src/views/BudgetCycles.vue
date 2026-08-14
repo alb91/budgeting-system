@@ -51,12 +51,36 @@
       <table class="table table-hover mt-3">
         <thead class="table-light">
           <tr>
-            <th>{{ t('name') }}</th>
-            <th>{{ t('start') }}</th>
-            <th>{{ t('end') }}</th>
-            <th>{{ t('budget') }}</th>
-            <th>{{ t('spent') }}</th>
-            <th>{{ t('remaining') }}</th>
+            <th>
+              {{ t('name') }}
+              <i v-if="sortDirection === 'asc' && sortBy === 'name'" @click="sortData('name', 'desc')" class="bi bi-arrow-down"></i>
+              <i v-else @click="sortData('name', 'asc')" class="bi bi-arrow-up"></i>
+            </th>
+            <th>
+              {{ t('start') }}
+              <i v-if="sortDirection === 'asc' && sortBy === 'start'" @click="sortData('start', 'desc')" class="bi bi-arrow-down"></i>
+              <i v-else @click="sortData('start', 'asc')" class="bi bi-arrow-up"></i>
+            </th>
+            <th>
+              {{ t('end') }}
+              <i v-if="sortDirection === 'asc' && sortBy === 'end'" @click="sortData('end', 'desc')" class="bi bi-arrow-down"></i>
+              <i v-else @click="sortData('end', 'asc')" class="bi bi-arrow-up"></i>
+            </th>
+            <th>
+              {{ t('budget') }}
+              <i v-if="sortDirection === 'asc' && sortBy === 'budget'" @click="sortData('budget', 'desc')" class="bi bi-arrow-down"></i>
+              <i v-else @click="sortData('budget', 'asc')" class="bi bi-arrow-up"></i>
+            </th>
+            <th>
+              {{ t('spent') }}
+              <i v-if="sortDirection === 'asc' && sortBy === 'spent'" @click="sortData('spent', 'desc')" class="bi bi-arrow-down"></i>
+              <i v-else @click="sortData('spent', 'asc')" class="bi bi-arrow-up"></i>
+            </th>
+            <th>
+              {{ t('remaining') }}
+              <i v-if="sortDirection === 'asc' && sortBy === 'remaining'" @click="sortData('remaining', 'desc')" class="bi bi-arrow-down"></i>
+              <i v-else @click="sortData('remaining', 'asc')" class="bi bi-arrow-up"></i>
+            </th>
             <th>{{ t('actions') }}</th>
           </tr>
         </thead>
@@ -105,6 +129,9 @@ import Swal from 'sweetalert2'
 import es from '@/locales/es/budgetCycles'
 import en from '@/locales/en/budgetCycles'
 
+// helpers
+import { sortTable } from '../helpers/sortTable';
+
 //constants
 const translations = { es, en }
 const { formatCurrency, capitalize } = useFormatters()
@@ -123,6 +150,8 @@ const spent = ref(0)
 const remaining = ref(0)
 const isEditing = ref(false)
 const editingId = ref(null)
+const sortDirection = ref(null); 
+const sortBy = ref(null);
 
 const errors = reactive({
   name: null,
@@ -253,6 +282,13 @@ async function save() {
 function t(key) {
  return translations[lang.value][key];  
 }
+
+const sortData = (column, direction) => {
+  sortDirection.value = direction;
+  sortBy.value = column;
+
+  sortTable(cycles.value, column, direction);
+};
 
 function addExpenses(id) {
     router.push({

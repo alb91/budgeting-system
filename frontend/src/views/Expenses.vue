@@ -82,18 +82,18 @@
           <tr>
             <th>
               {{ t('name') }}
-              <button type="button" class="btn btn-outline-success btn-sm" v-if="sortDirection === 'asc' && sortBy === 'name'" @click="sortData('name', 'desc')"><i class="bi bi-arrow-down"></i></button>
-              <button type="button" class="btn btn-outline-success btn-sm" v-else @click="sortData('name', 'asc')"><i class="bi bi-arrow-up"></i></button>
+              <i v-if="sortDirection === 'asc' && sortBy === 'name'" @click="sortData('name', 'desc')" class="bi bi-arrow-down"></i>
+              <i v-else @click="sortData('name', 'asc')" class="bi bi-arrow-up"></i>
             </th>
             <th>
               {{ t('date') }}
-              <button type="button" class="btn btn-outline-success btn-sm" v-if="sortDirection === 'asc' && sortBy === 'date'" @click="sortData('date', 'desc')"><i class="bi bi-arrow-down"></i></button>
-              <button type="button" class="btn btn-outline-success btn-sm" v-else @click="sortData('date', 'asc')"><i class="bi bi-arrow-up"></i></button>
+              <i v-if="sortDirection === 'asc' && sortBy === 'date'" @click="sortData('date', 'desc')" class="bi bi-arrow-down"></i>
+              <i v-else @click="sortData('date', 'asc')" class="bi bi-arrow-up"></i>
             </th>
             <th>
               {{ t('amount') }}
-              <button type="button" class="btn btn-outline-success btn-sm" v-if="sortDirection === 'asc' && sortBy === 'amount'" @click="sortData('amount', 'desc')"><i class="bi bi-arrow-down"></i></button>
-              <button type="button" class="btn btn-outline-success btn-sm" v-else @click="sortData('amount', 'asc')"><i class="bi bi-arrow-up"></i></button>
+              <i v-if="sortDirection === 'asc' && sortBy === 'amount'" @click="sortData('amount', 'desc')" class="bi bi-arrow-down"></i>
+              <i v-else @click="sortData('amount', 'asc')" class="bi bi-arrow-up"></i>
             </th>
             <th>{{ t('actions') }}</th>
           </tr>
@@ -135,6 +135,9 @@ import Swal from 'sweetalert2'
 //translations
 import es from '@/locales/es/expenses'
 import en from '@/locales/en/expenses'
+
+// helpers
+import { sortTable } from '../helpers/sortTable';
 
 //constants
 const translations = { es, en }
@@ -178,35 +181,14 @@ const search = (e) => {
   searchFilter.value = e.target.value;  
 }
 
-const sortData = (column, direction) => { 
+const sortData = (column, direction) => {
   sortDirection.value = direction;
   sortBy.value = column;
-  if(direction === 'asc' && column === 'name'){ 
-    expenses.value.sort((a, b) => {
-      return a.name.localeCompare(b.name);
-    });
-  }else if(direction === 'desc' && column === 'name'){
-    expenses.value.sort((a, b) => {
-      return b.name.localeCompare(a.name);
-    });
-  }else if(direction === 'asc' && column === 'date'){
-    expenses.value.sort((a, b) => {
-      return new Date(a.date) - new Date(b.date) 
-    });
-  }else if(direction === 'desc' && column === 'date'){ 
-    expenses.value.sort((a, b) => {
-      return new Date(b.date) - new Date(a.date) 
-    });
-  }else if(direction === 'asc' && column === 'amount'){
-    expenses.value.sort((a, b) => {
-      return parseFloat(a.amount) - parseFloat(b.amount) 
-    }); 
-  }else if(direction === 'desc' && column === 'amount'){
-    expenses.value.sort((a, b) => {
-      return parseFloat(b.amount) - parseFloat(a.amount) 
-    }); 
-  }
-}
+
+  sortTable(expenses.value, column, direction);
+};
+
+
 
 //lifecycle hooks
 onMounted(loadExpenses)
@@ -223,7 +205,6 @@ async function loadExpenses() {
 }
 
 async function save() {
-
   errors.value = entries.value.map(() => ({
     name: null,
     date: null,
