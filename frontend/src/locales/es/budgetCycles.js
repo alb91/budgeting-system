@@ -31,5 +31,6 @@ export default {
   addExpenses: "Agregar gastos",
   spent: "Gastado",
   remaining: "Restante",
-  searchCycles: 'Buscar ciclos'
+  searchCycles: 'Buscar ciclos',
+  search: 'Búsqueda'
 }

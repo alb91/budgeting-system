@@ -31,5 +31,6 @@ export default {
   addExpenses: "Add expenses",
   spent: "Spent",
   remaining: "Remaining",
-  searchCycles: 'Search cycles'
+  searchCycles: 'Search cycles',
+  search: 'Search'
 }

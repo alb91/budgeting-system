@@ -48,6 +48,13 @@
 
     <div v-if="cycles.length" class="cycles">
       <h2>{{ t('cycles') }}</h2>
+      <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+          <form class="d-flex">
+            <input class="form-control me-2" type="search" @input="search" :placeholder="t('search')" aria-label="Search">
+          </form>
+        </div>
+      </nav>
       <table class="table table-hover mt-3">
         <thead class="table-light">
           <tr>
@@ -86,7 +93,7 @@
         </thead>
 
         <tbody>
-          <tr v-for="cycle in cycles" :key="cycle.id">
+          <tr v-for="cycle in filteredItems" :key="cycle.id">
             <td>{{ capitalize(cycle.name) }}</td>
             <td>{{ cycle.start_date }}</td>
             <td>{{ cycle.end_date }}</td>
@@ -136,6 +143,16 @@ import { sortTable } from '../helpers/sortTable';
 const translations = { es, en }
 const { formatCurrency, capitalize } = useFormatters()
 const router = useRouter()
+const searchFilter = ref('');
+
+const columns = {
+  name: {field: 'name', type: 'text'},
+  start: {field: 'start_date', type: 'date'},
+  end: {field: 'end_date', type: 'date'},
+  budget: {field: 'budget', type: 'number'},
+  spent: {field: 'spent', type: 'number'},
+  remaining: {field: 'remaining', type: 'number'},
+}
 
 //refs
 const lang = ref('es')
@@ -287,8 +304,19 @@ const sortData = (column, direction) => {
   sortDirection.value = direction;
   sortBy.value = column;
 
-  sortTable(cycles.value, column, direction);
+  cycles.value = sortTable(cycles.value, columns, column, direction);
 };
+
+const filteredItems = computed(() => {
+  if(searchFilter.value != ''){
+    return cycles.value.filter(cycle => cycle.name.includes(searchFilter.value))
+  }
+  return cycles.value;
+})
+
+const search = (e) => {
+  searchFilter.value = e.target.value;  
+}
 
 function addExpenses(id) {
     router.push({

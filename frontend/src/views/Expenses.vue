@@ -151,6 +151,12 @@ const expenses = ref([]);
 const errors = ref([]); 
 const searchFilter = ref('');
 
+const columns = {
+  name: {field: 'name', type: 'text'},
+  date: {field: 'date', type: 'date'},
+  amount: {field: 'amount', type: 'number'},
+}
+
 
 const totalSpent = computed(() => 
   expenses.value.reduce((sum, e) => sum + Number(e.amount), 0)
@@ -185,7 +191,7 @@ const sortData = (column, direction) => {
   sortDirection.value = direction;
   sortBy.value = column;
 
-  sortTable(expenses.value, column, direction);
+  expenses.value = sortTable(expenses.value, columns, column, direction);
 };
 
 
