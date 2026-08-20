@@ -5,10 +5,10 @@
         <h1 class="mb-0" v-if="cycle">{{ t('expensesFor') }}: {{ capitalize(cycle.name) }}</h1>
 
         <div class="d-flex gap-2">
-          <button class="btn btn-outline-secondary btn-sm" @click="lang = 'es'">ES</button>
-          <button class="btn btn-outline-secondary btn-sm" @click="lang = 'en'">EN</button>
-          <button class="btn btn-outline-secondary btn-sm" @click="goBack"> ← {{ t('goBack') }}</button> 
-          <button class="btn btn-primary" @click="openModal">{{ t('createExpense')}}</button>
+          <button class="btn btn-outline-secondary btn-sm" @click="changeLang"><i class="bi bi-translate"></i></button>
+          <button class="btn btn-outline-secondary btn-sm" @click="goBack"><i class="bi bi-arrow-return-left"></i> {{ t('goBack') }}</button> 
+          <button class="btn btn-success" @click="openCategories"><i class="bi bi-bookmark"></i> {{ t('categories')}}</button>
+          <button class="btn btn-primary" @click="openModal"><i class="bi bi-cash"></i> {{ t('createExpense')}}</button>
         </div>
       </div>
 
@@ -168,6 +168,7 @@ cycle.value ? cycle.value.budget - totalSpent.value : 0
 //refs
 const lang = ref('es')
 const showForm = ref(false)
+const showCategories = ref(false)
 const entries = ref([
   { name: '', date: '',  amount: 0}
 ])
@@ -316,8 +317,16 @@ async function deleteExpense(id) {
 }
 
 //helpers
-function t(key) {
+function t(key) { 
  return translations[lang.value][key];  
+}
+
+function changeLang(){
+  if(lang.value === 'es') {
+    lang.value = 'en'
+  } else {
+    lang.value = 'es'
+  }
 }
 
 function addRow() {
@@ -337,6 +346,10 @@ function openModal() {
     date: null, 
     amount: null
   }));
+}
+
+function openCategories(){
+  showCategories.value = true; 
 }
 
 function closeModal() {

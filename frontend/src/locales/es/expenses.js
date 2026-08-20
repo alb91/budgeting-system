@@ -28,5 +28,6 @@ export default {
     deleteSuccess: 'El gasto ha sido eliminado.',
     error: 'Error',
     deleteError: 'Algo salió mal.',
-    search: 'Búsqueda'
+    search: 'Búsqueda',
+    categories: 'Categorías'
 }

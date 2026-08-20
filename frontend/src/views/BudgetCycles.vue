@@ -1,14 +1,14 @@
 <template>
   <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="mb-0">{{ t('title') }}</h1>
-
-      <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary btn-sm" @click="lang = 'es'">ES</button>
-        <button class="btn btn-outline-secondary btn-sm" @click="lang = 'en'">EN</button>
+    <div class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">{{ t('title') }}</h1>
+        
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm" @click="changeLang"><i class="bi bi-translate"></i></button>
+          <button class="btn btn-primary" @click="openModal">{{ t('createCycle')}}</button>
+        </div>
       </div>
-
-      <button class="btn btn-primary" @click="openModal">{{ t('createCycle')}}</button>
     </div>
     
 
@@ -298,6 +298,14 @@ async function save() {
 //helpers
 function t(key) {
  return translations[lang.value][key];  
+}
+
+function changeLang(){
+  if(lang.value === 'es') {
+    lang.value = 'en'
+  } else {
+    lang.value = 'es'
+  }
 }
 
 const sortData = (column, direction) => {
