@@ -5,6 +5,7 @@ export default {
     nameRequired: 'Name Required', 
     dateRequired: 'Date Required', 
     amountInvalid: 'Invalid Amount',
+    categoryRequired: 'Category Required',
     newExpense: 'New Expense',
     expensePlaceHolder: 'Groceries',
     amountPlaceHolder: '10,000',
@@ -27,7 +28,15 @@ export default {
     deleted: 'Deleted!',
     deleteSuccess: 'The expense has been deleted.',
     error: 'Error',
-    deleteError: 'Something went wrong',
+    errorMessage: 'Something went wrong',
     search: 'Search',
-    categories: 'Categories'
+    categories: 'Categories',
+    category: 'Category',
+    choose: 'Choose a color',
+    categoriesPlaceHolder: 'Transportation',
+    colorRequired: 'Select a color',
+    confirmCategoryDeleteText: 'This category will be deleted',
+    saving: 'Saving...',
+    addCategory: 'Add category',
+    selectedCategory: 'Select category'
 }

@@ -5,6 +5,7 @@ export default {
     nameRequired: 'Nombre Requerido',
     dateRequired: 'Fecha Requerida',
     amountInvalid: 'Cantidad Inválida',
+    categoryRequired: 'Categoría Requerida',
     newExpense: 'Nuevo Gasto',
     expensePlaceHolder: 'Mandado',
     amountPlaceHolder: '10,000',
@@ -27,7 +28,15 @@ export default {
     deleted: '¡Eliminado!',
     deleteSuccess: 'El gasto ha sido eliminado.',
     error: 'Error',
-    deleteError: 'Algo salió mal.',
+    errorMessage: 'Algo salió mal.',
     search: 'Búsqueda',
-    categories: 'Categorías'
+    categories: 'Categorías',
+    category: 'Categoría',
+    choose: 'Elige un color',
+    categoriesPlaceHolder: 'Transporte',
+    colorRequired: 'Selecciona un color',
+    confirmCategoryDeleteText: 'Esta categoría será eliminada',
+    saving: 'Guardando...',
+    addCategory: 'Agregar categoría',
+    selectedCategory: 'Seleccionar categoría'
 }

@@ -18,6 +18,7 @@ class Database
 
         try {
             return new PDO($dsn, $user, $pass, [
+                PDO::MYSQL_ATTR_FOUND_ROWS => true,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]);
         } catch (PDOException $e) {

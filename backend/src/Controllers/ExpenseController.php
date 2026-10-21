@@ -65,14 +65,16 @@ class ExpenseController
     {
         $id = (int) $args['id']; 
 
+        if (!$id) {
+            return $this->json($response, ['error' => 'Invalid JSON'], 400);
+        }
+
         try {
             ExpenseService::delete($id); 
 
             return $response->withStatus(204); 
         } catch (\InvalidArgumentException $e) {
-            return $this->json($response, [
-                
-            ]);
+            return $this->json($response, ['error' => $e->getMessage()], 400);
         }
     }
 

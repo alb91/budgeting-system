@@ -31,7 +31,8 @@ class ExpenseService
             'name'     => strtolower($data['name']),
             'date'     => $data['date'],
             'amount'   => $data['amount'],
-            'notify'   => $data['notify'] ? 1 : 0,
+            'category' => $data['category'],
+            'notify'   => $data['notify'] ?? 0,
         ]);
     }
 
@@ -44,10 +45,11 @@ class ExpenseService
         self::validate($data);
 
         return ExpenseRepository::update($id, [
-            'name'   => strtolower($data['name']),
-            'date'   => $data['date'],
-            'amount' => $data['amount'],
-            'notify' => $data['notify'] ? 1 : 0,
+            'name'     => strtolower($data['name']),
+            'date'     => $data['date'],
+            'amount'   => $data['amount'],
+            'category' => $data['category'],
+            'notify'   => $data['notify'] ?? 0,
         ]);
     }
 
@@ -58,7 +60,7 @@ class ExpenseService
 
     private static function validate(array $data): void
     {
-        $requiredFields = ['name', 'date', 'amount'];
+        $requiredFields = ['name', 'date', 'amount', 'category'];
 
         foreach($requiredFields as $field) {
             if(!array_key_exists($field, $data) || $data[$field] == '' || $data[$field] == null) {

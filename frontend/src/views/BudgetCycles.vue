@@ -48,13 +48,7 @@
 
     <div v-if="cycles.length" class="cycles">
       <h2>{{ t('cycles') }}</h2>
-      <nav class="navbar navbar-light bg-light">
-        <div class="container-fluid">
-          <form class="d-flex">
-            <input class="form-control me-2" type="search" @input="search" :placeholder="t('search')" aria-label="Search">
-          </form>
-        </div>
-      </nav>
+      <SearchName v-model="searchFilter" :placeholder="t('search')"></SearchName>
       <table class="table table-hover mt-3">
         <thead class="table-light">
           <tr>
@@ -131,6 +125,7 @@ import { useFormatters } from '@/composables/useFormatters'
 import { useRouter } from 'vue-router'
 import api from '@/api/http'
 import Swal from 'sweetalert2'
+import SearchName from '@/components/SearchName.vue'
 
 //translations
 import es from '@/locales/es/budgetCycles'
@@ -316,15 +311,14 @@ const sortData = (column, direction) => {
 };
 
 const filteredItems = computed(() => {
-  if(searchFilter.value != ''){
-    return cycles.value.filter(cycle => cycle.name.includes(searchFilter.value))
-  }
-  return cycles.value;
-})
+  const query = searchFilter.value.trim().toLocaleLowerCase();
 
-const search = (e) => {
-  searchFilter.value = e.target.value;  
-}
+  if (!query) return cycles.value;
+
+  return cycles.value.filter((cycle) => 
+    cycle.name.toLocaleLowerCase().includes(query)
+  );
+});
 
 function addExpenses(id) {
     router.push({

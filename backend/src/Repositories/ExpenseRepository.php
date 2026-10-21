@@ -14,7 +14,7 @@ class ExpenseRepository
         $pdo = Database::connect(); 
 
         $stmt = $pdo->prepare("
-        SELECT id, name, date, amount, notify
+        SELECT id, name, date, amount, category, notify
         FROM " . self::TABLE . "
         WHERE cycle_id = :cycle_id
         AND status = 1
@@ -36,8 +36,8 @@ class ExpenseRepository
             $pdo->beginTransaction();
 
             $stmt = $pdo->prepare("
-                INSERT INTO " . self::TABLE . " (cycle_id, name, date, amount, notify)
-                VALUES (:cycle_id, :name, :date, :amount, :notify)
+                INSERT INTO " . self::TABLE . " (cycle_id, name, date, amount, category, notify)
+                VALUES (:cycle_id, :name, :date, :amount, :category, :notify)
             ");
 
             $stmt->execute($data); 
@@ -79,16 +79,18 @@ class ExpenseRepository
                     name = :name,
                     date = :date,
                     amount = :amount,
+                    category = :category,
                     notify = :notify
                 WHERE id = :id
             ");
 
             $stmt->execute([
-                ':name'   => $data['name'],
-                ':date'   => $data['date'],
-                ':amount' => $data['amount'],
-                ':notify' => $data['notify'],
-                ':id'     => $id
+                ':name'     => $data['name'],
+                ':date'     => $data['date'],
+                ':amount'   => $data['amount'],
+                ':category' => $data['category'],
+                ':notify'   => $data['notify'],
+                ':id'       => $id
             ]);
 
             $pdo->commit(); 
@@ -135,17 +137,20 @@ class ExpenseRepository
         
         $stmt = $pdo->prepare("
             SELECT 
-                id, 
-                cycle_id,
-                name,
-                date,
-                amount
-            FROM " . self::TABLE . "
-            WHERE
-                status = 1
-                AND notify = 1
-                AND notification_sent IS NULL
-                AND DATE(date) = CURDATE()
+                e.id, 
+                e.cycle_id,
+                e.name,
+                e.date,
+                e.amount
+            FROM " . self::TABLE . " e
+            LEFT JOIN budget_cycles bc
+                ON e.cycle_id = bc.id
+            WHERE 
+                bc.status = 1
+                AND e.status = 1
+                AND e.notify = 1
+                AND e.notification_sent IS NULL
+                AND e.DATE(date) = CURDATE()
         ");
 
         $stmt->execute(); 
